@@ -1,0 +1,166 @@
+<?xml version="1.0"?>
+<sdf version="1.6">
+  <model name="realsense_d435">
+    <link name="link">
+      <inertial>
+        <mass>0.0615752</mass>
+        <inertia>
+          <ixx>9.108e-05</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>2.51e-06</iyy>
+          <iyz>0</iyz>
+          <izz>8.931e-05</izz>
+        </inertia>
+        <pose frame=''>0 0 0 0 -0 0</pose>
+      </inertial>
+      <collision name="collision">
+        <pose>0 0 0 0 0 1.5708</pose>
+        <geometry>
+          <mesh>
+            <uri>model://alex_realsense_d435/meshes/realsense.dae</uri>
+          </mesh>
+        </geometry>
+      </collision>
+      <visual name= "visual">
+        <pose>0 0 0 0 0 1.5708</pose>
+        <geometry>
+          <mesh>
+            <uri>model://alex_realsense_d435/meshes/realsense.dae</uri>
+            <submesh>
+              <name>RealSense</name>
+              <center>false</center>
+            </submesh>
+          </mesh>
+        </geometry>
+        <material>
+          <diffuse>1.0 1.0 1.0</diffuse>
+          <specular>1.0 1.0 1.0</specular>
+          <pbr>
+            <metal>
+              <albedo_map>model://alex_realsense_d435/materials/textures/RealSense_Albedo.png</albedo_map>
+              <normal_map>model://alex_realsense_d435/materials/textures/RealSense_Normal.png</normal_map>
+              <metalness_map>model://alex_realsense_d435/materials/textures/RealSense_Metalness.png</metalness_map>
+              <roughness_map>model://alex_realsense_d435/materials/textures/RealSense_Roughness.png</roughness_map>
+            </metal>
+          </pbr>
+          <!-- fallback to script if no PBR support-->
+          <script>
+            <uri>model://alex_realsense_d435/materials/scripts/</uri>
+            <uri>model://alex_realsense_d435/materials/textures/</uri>
+            <name>UrbanTile/RealSense_Diffuse</name>
+          </script>
+        </material>
+      </visual>
+
+      <!--
+      D435相机物理尺寸参数：
+        - 以红外发射器为Y方向原点
+        - 双目间距50mm, 左目Y=29mm，右目Y=-21mm
+      -->
+      <!-- 双目相机 -->
+      <sensor type="multicamera" name="camera_1">
+        <update_rate>60</update_rate>
+        <visualize>true</visualize>
+        <camera name="left">
+          <pose>0 0.029 0 0 0 0</pose>
+          <horizontal_fov>1.5917</horizontal_fov>    <!-- 水平视场角(d435=91.2°)，单位rad -->
+          <image>
+            <width>640</width>
+            <height>480</height>
+            <format>R8G8B8</format>
+          </image>
+          <clip>
+            <near>0.02</near>
+            <far>300</far>
+          </clip>
+          <noise>
+            <type>gaussian</type>
+            <mean>0.0</mean>
+            <stddev>0.007</stddev>
+          </noise>
+        </camera>
+        <camera name="right">
+          <pose>0 -0.021 0 0 0 0</pose>
+          <horizontal_fov>1.5917</horizontal_fov>
+          <image>
+            <width>640</width>
+            <height>480</height>
+            <format>R8G8B8</format>
+          </image>
+          <clip>
+            <near>0.02</near>
+            <far>300</far>
+          </clip>
+          <noise>
+            <type>gaussian</type>
+            <mean>0.0</mean>
+            <stddev>0.007</stddev>
+          </noise>
+        </camera>
+        <plugin name="camera_controller" filename="libgazebo_ros_camera.so">
+          <ros>
+            <namespace>demo_cam</namespace>
+            <!-- topics need to be prefixed with camera_name for remapping -->
+            <remapping>mycamera/left/image_raw:=mycamera/left/image_demo</remapping>
+            <remapping>mycamera/right/image_raw:=mycamera/right/image_demo</remapping>
+            <remapping>mycamera/left/camera_info:=mycamera/left/camera_info_demo</remapping>
+            <remapping>mycamera/right/camera_info:=mycamera/right/camera_info_demo</remapping>
+          </ros>
+
+          <camera_name>mycamera</camera_name>
+
+          <!-- frame_name>omit so it defaults to link name</frame_name-->
+        </plugin>
+      </sensor>
+
+      <!-- 深度相机 -->
+      <sensor type="depth" name="camera_2">
+        <update_rate>60</update_rate>
+        <visualize>true</visualize>
+        <camera>
+          <pose>0 0.0 0 0 0 0</pose>              <!-- RGB相机-->
+          <horizontal_fov>1.211</horizontal_fov>    <!-- 水平视场角(d435=69.4°)，单位rad -->
+          <image>
+            <width>640</width>
+            <height>480</height>
+            <format>B8G8R8</format>
+          </image>
+          <depth_camera>
+            <output>depths</output>
+          </depth_camera>
+          <clip>                            <!-- 给定深度相机测量范围，注意该范围不要太大，不然深度信息无法区分-->
+            <near>0.02</near>
+            <far>10</far>
+          </clip>
+          <noise>
+            <type>gaussian</type>
+            <mean>0.0</mean>
+            <stddev>0.007</stddev>
+          </noise>
+        </camera>
+        <plugin name="camera_controller" filename="libgazebo_ros_camera.so">
+          <ros>
+            <namespace>demo_cam</namespace>
+
+            <!-- topics need to be prefixed with camera_name for remapping -->
+            <remapping>mycamera/image_raw:=mycamera/image_demo</remapping>
+            <remapping>mycamera/depth/image_raw:=mycamera/depth_demo</remapping>
+            <remapping>mycamera/camera_info:=mycamera/raw_cam_info_demo</remapping>
+            <remapping>mycamera/depth/camera_info:=mycamera/depth_cam_info_demo</remapping>
+            <remapping>mycamera/points:=mycamera/points_demo</remapping>
+          </ros>
+
+          <!-- omit camera_name to default to sensor name -->
+          <camera_name>mycamera</camera_name>
+
+          <!-- frame_name>omit so it defaults to link name</frame_name-->
+
+          <min_depth>0.1</min_depth>
+          <max_depth>500</max_depth>
+        </plugin>
+      </sensor>
+
+    </link>
+  </model>
+</sdf>
