@@ -191,7 +191,10 @@ include_directories(
   ${EIGEN3_INCLUDE_DIRS}/eigen3	# Workaround for Eigen3
   ${GAZEBO_INCLUDE_DIRS}
   ${GAZEBO_MSG_INCLUDE_DIRS}
-  ${MAVLINK_INCLUDE_DIRS}
+
+  # ${MAVLINK_INCLUDE_DIRS}      # 由于无法通过find_package查找mavlink，故不用该行，后面通过手动指定
+  # /opt/ros/foxy/include/mavlink  # 手动给定mavlink的路径（这里通过sudo apt-get install ros-foxy-mavlink安装）
+
   ${OGRE_INCLUDE_DIRS}
   ${OGRE_INCLUDE_DIRS}/Paging		# Workaround for "fatal error: OgrePagedWorldSection.h: No such file or directory"
   ${OpenCV_INCLUDE_DIRS}
