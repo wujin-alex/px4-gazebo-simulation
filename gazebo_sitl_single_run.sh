@@ -59,7 +59,7 @@ pkill -x px4 || true
 
 sleep 1
 
-source ${src_path}/setup_gazebo.bash ${src_path} ${src_path}/build
+source ${src_path}/setup_gazebo.bash ${src_path} ${src_path}/sitl_gazebo/build
 
 echo "Starting gazebo"
 gzserver ${src_path}/sitl_gazebo/worlds/${world}.world --verbose &
