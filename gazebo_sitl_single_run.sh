@@ -5,6 +5,7 @@
 # gazebo运行单机示例：
 # ./gazebo_sitl_single_run.sh -m alex_iris_realsense_d435
 # ./gazebo_sitl_single_run.sh -m alex_iris_realsense_d435 -w baylands
+# ./gazebo_sitl_single_run.sh -m alex_iris_realsense_d435 -w baylands -x -2.0 y 2.0
 
 function cleanup() {
 	pkill -x px4
@@ -14,38 +15,42 @@ function cleanup() {
 
 if [ "$1" == "-h" ] || [ "$1" == "--help" ]
 then
-	echo "Usage: $0 [-n <num_vehicles>] [-m <vehicle_model>] [-w <world>]"
+	echo "Usage: $0 [-m <vehicle_model>] [-w <world>] [-x <init_x>] [-y <init_y>]"
 	exit 1
 fi
 
-while getopts n:m:w:s:t:l: option
+while getopts m:w:d:x:y:s:t: option
 do
 	case "${option}"
 	in
-		n) NUM_VEHICLES=${OPTARG};;
 		m) VEHICLE_MODEL=${OPTARG};;
 		w) WORLD=${OPTARG};;
+		d) DIR_WORLD=${OPTARG};;
+		x) PX=${OPTARG};;
+		y) PY=${OPTARG};;
 		s) SCRIPT=${OPTARG};;
 		t) TARGET=${OPTARG};;
-		l) LABEL=_${OPTARG};;
 	esac
 done
 
-num_vehicles=${NUM_VEHICLES:=3}
-world=${WORLD:=empty}
-target=${TARGET:=px4_sitl_default}
 vehicle_model=${VEHICLE_MODEL:="iris"}
+world=${WORLD:=empty}
+dir_world=${DIR_WORLD:=""}
+px=${PX:=0.0}
+py=${PY:=0.0}
+target=${TARGET:=px4_sitl_default}
+
 export PX4_SIM_MODEL=iris                                               # PX4仿真模型，这里固定为iris（这个用于rcS脚本）
 
 echo ${SCRIPT}
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 src_path="$SCRIPT_DIR"
-
 echo ">>>>> [Alex: gazebo_sitl_multiple_run.sh], src_path=${src_path}"
 
+# TODO: [Alex], 根据PX4工程路径设置
 px4_src_path="/home/alex/Desktop/PX4-Autopilot_v1.12.3_learning"       # 设置PX4工程目录
 px4_build_path=${px4_src_path}/build/${target}                         # PX4编译路径，build_path=PX4-Autopilot/build/px4_sitl_default
-# build_path=${src_path}/build/${target}                                 # build_path=PX4-Autopilot/build/px4_sitl_default
+# build_path=${src_path}/build/${target}                               # build_path=PX4-Autopilot/build/px4_sitl_default
 mavlink_udp_port=14560
 mavlink_tcp_port=4560
 
@@ -71,7 +76,7 @@ pushd "$working_dir" &>/dev/null
 ../bin/px4 -i 0 -d "$px4_build_path/etc" -w sitl_iris_0 -s etc/init.d-posix/rcS >out.log 2>err.log &
 
 # TODO: [Alex], 添加gazebo模型
-gz model --spawn-file=${src_path}/sitl_gazebo/models/${vehicle_model}/${vehicle_model}.sdf --model-name=${vehicle_model} -x 0.0 -y 0.0 -z 0.0
+gz model --spawn-file=${src_path}/sitl_gazebo/models/${vehicle_model}/${vehicle_model}.sdf --model-name=${vehicle_model} -x ${px} -y ${py} -z 0.0
 
 popd &>/dev/null
 

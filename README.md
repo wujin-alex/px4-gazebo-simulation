@@ -25,7 +25,7 @@ $ make
 - 指定模型和世界
 
   ```shell
-  $ ./Tools/gazebo_sitl_single_run.sh -m alex_iris_realsense_d435 -w baylands
+  $ ./gazebo_sitl_single_run.sh -m alex_iris_realsense_d435 -w baylands
   ```
 
   
