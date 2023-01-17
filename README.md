@@ -1,5 +1,7 @@
 # PX4-Gazebo-Simulation
 
+本工程是基于PX4-Autopilot/Tools/sitl_gazebo修改而来，主要目的是将gazebo仿真部分的代码独立出来，但实际运行仍然需要PX4。
+
 ## 环境配置
 
 ### ROS2
@@ -43,19 +45,19 @@ $ make px4_sitl_default gazebo
 - 指定模型
 
   ```shell
-  $ ./gazebo_sitl_single_run.sh -m alex_iris_realsense_d435
+  $ ./gazebo_sitl_single_run.sh -m alex_iris_realsense_d455
   ```
 
 - 指定模型和世界
 
   ```shell
-  $ ./gazebo_sitl_single_run.sh -m alex_iris_realsense_d435 -w baylands
+  $ ./gazebo_sitl_single_run.sh -m alex_iris_realsense_d455 -w baylands
   ```
 
 - 设置模型初始位置
   
   ```shell
-  $ ./gazebo_sitl_single_run.sh -m alex_iris_realsense_d435 -w baylands -x -0.2 -y 1.0
+  $ ./gazebo_sitl_single_run.sh -m alex_iris_realsense_d455 -w baylands -x -0.2 -y 1.0
   ```
   
   
